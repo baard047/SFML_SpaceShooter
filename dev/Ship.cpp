@@ -8,8 +8,10 @@
 
 #include "Ship.h"
 #include "utils/AssetsStorage.h"
+#include "utils/utils.h"
 
 #include <cmath>
+#include <iostream>
 
 namespace {
 constexpr const float PI = 3.14159265;
@@ -23,13 +25,15 @@ Ship::Ship( sf::Vector2u windowSize )
       hp( maxHp )
 {
     sprite.setTexture( AssetsStorage::instance().get< sf::Texture >( textures::SHIP ) );
+    sprite.setOrigin( utils::getCenterOfObject( sprite ) );
     sprite.scale( 0.1f, 0.1f );
-//    sprite.setOrigin( (float)sprite.getTextureRect().width / 2, (float)sprite.getTextureRect().height / 2 );
 
     maxHpBarWidth = sprite.getGlobalBounds().width;
     hpBarBackground.setSize({ maxHpBarWidth, 10.f });
     hpBarBackground.setFillColor( sf::Color{ 50, 50, 50, 80 } );
     hpBarInner.setFillColor( sf::Color{ 250, 20, 20, 100 } );
+    hpBarBackground.setOrigin( utils::getCenterOfObject( hpBarBackground ) );
+    hpBarInner.setOrigin( hpBarBackground.getOrigin() );
 
     restart( windowSize );
 }
@@ -40,16 +44,11 @@ void Ship::restart( sf::Vector2u windowSize )
     bulletsMissed = 0;
     bulletsFired = 0;
 
-    float x = (float)windowSize.x / 2 - sprite.getGlobalBounds().width / 2;
-    float y = windowSize.y - 200.f;
+    auto centerOfShip = utils::getCenterOfObject( sprite );
 
-    sprite.setPosition( x , y );
+    sprite.setPosition( (float)windowSize.x / 2.f, (float)windowSize.y + sprite.getGlobalBounds().height - 200.f );
 
-    float centerOfShipX = sprite.getPosition().x + sprite.getGlobalBounds().width / 2.f;
-    float hpBarX = centerOfShipX - hpBarBackground.getSize().x / 2;
-    float hpBarY = sprite.getPosition().y + sprite.getGlobalBounds().height + 5.f;
-
-    hpBarBackground.setPosition( hpBarX, hpBarY );
+    hpBarBackground.setPosition( sprite.getPosition().x, sprite.getPosition().y + centerOfShip.y + 5.f );
     hpBarInner.setPosition( hpBarBackground.getPosition() );
     hpBarInner.setSize( hpBarBackground.getSize() );
 
@@ -77,10 +76,10 @@ void Ship::fire()
 
 void Ship::update( float dt, sf::Vector2< int > mousePos )
 {
-//    float dx = static_cast<float>( mousePos.x ) - sprite.getPosition().x;
-//    float dy = static_cast<float>( mousePos.y ) - sprite.getPosition().y;
-//    float angle = std::atan2( dy, dx ) * ( 180 / PI );
-//    sprite.setRotation( 90 + angle );
+    float dx = static_cast<float>( mousePos.x ) - sprite.getPosition().x;
+    float dy = static_cast<float>( mousePos.y ) - sprite.getPosition().y;
+    float angle = std::atan2( dy, dx ) * ( 180 / PI );
+    sprite.setRotation( 90 + angle );
 
     for( auto bulletIt = bullets.begin(); bulletIt != bullets.end(); )
     {
