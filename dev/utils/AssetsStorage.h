@@ -1,6 +1,5 @@
 /*
  * \file AssetsStorage.h
- * \copyright (C) 2020 Special Technological Center Ltd
  * \author : Bardashevsky A.K.
  * \date : 13.09.2020
  * \time : 14:14

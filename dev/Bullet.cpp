@@ -1,6 +1,5 @@
 /*
  * \file Bullet.cpp
- * \copyright (C) 2020 Special Technological Center Ltd
  * \author : Bardashevsky A.K.
  * \date : 13.09.2020
  * \time : 13:49
@@ -25,9 +24,9 @@ void Bullet::update( float dt )
     sprite.move( direction * movementSpeed * dt );
 }
 
-void Bullet::render( sf::RenderTarget & target )
+void Bullet::render( sf::RenderTarget & window )
 {
-    target.draw( sprite );
+    window.draw( sprite );
 }
 
 sf::FloatRect Bullet::getBounds() const

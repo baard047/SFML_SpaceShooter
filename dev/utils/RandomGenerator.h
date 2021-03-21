@@ -1,6 +1,5 @@
 /*
  * \file random_generator.h
- * \copyright (C) 2020 Special Technological Center Ltd
  * \author : Bardashevsky A.K.
  * \date : 26.06.2020
  * \time : 18:12

@@ -1,6 +1,5 @@
 /*
  * \file Game.cpp
- * \copyright (C) 2020 Special Technological Center Ltd
  * \author : Bardashevsky A.K.
  * \date : 13.09.2020
  * \time : 11:45
@@ -11,12 +10,9 @@
 #include "utils/AssetsStorage.h"
 #include <utils/RandomGenerator.h>
 
-#include <iostream>
-
-
 namespace {
 constexpr const float dtMultiplier = 144.f;
-constexpr const float ASTEROIDS_RESPAWN_COOLDOWN = 0.5f;
+constexpr const float ASTEROIDS_RESPAWN_COOLDOWN = 0.6f;
 
 }
 
@@ -106,25 +102,29 @@ void Game::render()
 
 void Game::processEvents()
 {
+    //TODO if it'll be more complex do Finite State Machine
+
     sf::Event event{};
     while( window->pollEvent( event ) )
     {
-        if( event.type == sf::Event::Closed
-            || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape )
+        if( event.type == sf::Event::Closed ||
+            ( event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape ) )
         {
             window->close();
         }
 
         if( gameState == Play )
         {
-            if( event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left )
+            if( event.type == sf::Event::MouseButtonPressed
+                && event.mouseButton.button == sf::Mouse::Left )
             {
                 ship->fire();
             }
         }
         else if( gameState == GameOver )
         {
-            if( event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space )
+            if( event.type == sf::Event::KeyPressed
+                && event.key.code == sf::Keyboard::Space )
             {
                 restartGame();
             }
@@ -191,7 +191,7 @@ void Game::updateAsteroids( float dt )
         }
         else if( asteroid->getBounds().top > window->getSize().y )
         {
-            stats.score -= asteroid->getPoints() * 2;
+            stats.score -= asteroid->getPoints();
 
             asteroid = asteroids.erase( asteroid );
         }

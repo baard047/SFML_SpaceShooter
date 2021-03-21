@@ -1,6 +1,5 @@
 /*
  * \file Ship.cpp
- * \copyright (C) 2020 Special Technological Center Ltd
  * \author : Bardashevsky A.K.
  * \date : 13.09.2020
  * \time : 12:13
@@ -11,7 +10,6 @@
 #include "utils/utils.h"
 
 #include <cmath>
-#include <iostream>
 
 namespace {
 constexpr const float PI = 3.14159265;
@@ -20,15 +18,18 @@ constexpr const float PI = 3.14159265;
 namespace space_shooter {
 
 Ship::Ship( sf::Vector2u windowSize )
-    : movementSpeed( 5.f ),
-      maxHp( 100 ),
-      hp( maxHp )
+        : sprite( []()
+                  {
+                      sf::Sprite sprite{ AssetsStorage::instance().get< sf::Texture >( textures::SHIP ) };
+                      sprite.setOrigin( utils::getCenterOfObject( sprite ) );
+                      sprite.scale( 0.1f, 0.1f );
+                      return sprite;
+                  }() ),
+          maxHpBarWidth( sprite.getGlobalBounds().width ),
+          movementSpeed( 5.f ),
+          maxHp( 5 ),
+          hp( maxHp )
 {
-    sprite.setTexture( AssetsStorage::instance().get< sf::Texture >( textures::SHIP ) );
-    sprite.setOrigin( utils::getCenterOfObject( sprite ) );
-    sprite.scale( 0.1f, 0.1f );
-
-    maxHpBarWidth = sprite.getGlobalBounds().width;
     hpBarBackground.setSize({ maxHpBarWidth, 10.f });
     hpBarBackground.setFillColor( sf::Color{ 50, 50, 50, 80 } );
     hpBarInner.setFillColor( sf::Color{ 250, 20, 20, 100 } );
@@ -43,9 +44,9 @@ void Ship::restart( sf::Vector2u windowSize )
     hp = maxHp;
     bulletsMissed = 0;
     bulletsFired = 0;
+    sprite.setPosition(0., 0.);
 
     auto centerOfShip = utils::getCenterOfObject( sprite );
-
     sprite.setPosition( (float)windowSize.x / 2.f, (float)windowSize.y + sprite.getGlobalBounds().height - 200.f );
 
     hpBarBackground.setPosition( sprite.getPosition().x, sprite.getPosition().y + centerOfShip.y + 5.f );
@@ -67,8 +68,8 @@ void Ship::move( float dirX, float dirY )
 void Ship::fire()
 {
     //bullet positioning on center of the ship
-    float xPos = ( sprite.getPosition().x + sprite.getGlobalBounds().width / 2.f ) - 5.f;
-    sf::Vector2f pos { xPos, sprite.getPosition().y };
+    float y = sprite.getPosition().y - sprite.getGlobalBounds().height / 2;
+    sf::Vector2f pos { sprite.getPosition().x - 5.f, y };
 
     bullets.emplace_back( pos, sf::Vector2f{ 0.f, -1.f }, movementSpeed * 1.5f );
     ++bulletsFired;
@@ -76,10 +77,14 @@ void Ship::fire()
 
 void Ship::update( float dt, sf::Vector2< int > mousePos )
 {
-    float dx = static_cast<float>( mousePos.x ) - sprite.getPosition().x;
-    float dy = static_cast<float>( mousePos.y ) - sprite.getPosition().y;
-    float angle = std::atan2( dy, dx ) * ( 180 / PI );
-    sprite.setRotation( 90 + angle );
+//    float dx = static_cast<float>( mousePos.x ) - sprite.getPosition().x;
+//    float dy = static_cast<float>( mousePos.y ) - sprite.getPosition().y;
+
+//    float angle = std::atan2( dy, dx ) * ( 180 / PI );
+//    sprite.setRotation( 90 + angle );
+//    hpBarBackground.setRotation( sprite.getRotation() );
+//    hpBarInner.setRotation( sprite.getRotation() );
+//    hpBarInner.setPosition( hpBarBackground.getPosition() );
 
     for( auto bulletIt = bullets.begin(); bulletIt != bullets.end(); )
     {
@@ -92,14 +97,17 @@ void Ship::update( float dt, sf::Vector2< int > mousePos )
         }
         else { ++bulletIt; }
     }
+
+//    auto b = sprite.getGlobalBounds();
+//    auto pos = sprite.getPosition();
 }
 
-void Ship::render( sf::RenderTarget & target )
+void Ship::render( sf::RenderTarget & window )
 {
-    target.draw( sprite );
-    target.draw( hpBarBackground );
-    target.draw( hpBarInner );
-    for( auto &bullet : bullets ) { bullet.render( target ); }
+    window.draw( sprite );
+    window.draw( hpBarBackground );
+    window.draw( hpBarInner );
+    for( auto &bullet : bullets ) { bullet.render( window ); }
 }
 
 Asteroid::Collisions Ship::checkCollisions( const Asteroid & asteroid )
@@ -124,7 +132,7 @@ Asteroid::Collisions Ship::checkCollisions( const Asteroid & asteroid )
 
 void Ship::decreaseHP( int32_t amount )
 {
-    if( hp <= 0 ) { throw std::logic_error( "Ship already destroyed!" ); }
+    if( hp <= 0 ) { return; } //TODO log warning
 
     hp -= amount;
     float hpPercent = static_cast< float >( hp ) / static_cast< float >( maxHp );
@@ -133,7 +141,7 @@ void Ship::decreaseHP( int32_t amount )
 
 bool Ship::isBulletOutsideOfTheScreen( const Bullet & bullet ) const noexcept
 {
-    //TODO
+    //TODO update condition, than ship can rotate and bullets will fly in others directions
     return bullet.getBounds().top + bullet.getBounds().height < 0.f;
 }
 

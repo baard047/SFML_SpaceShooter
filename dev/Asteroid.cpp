@@ -1,6 +1,5 @@
 /*
  * \file Asteroid.cpp
- * \copyright (C) 2020 Special Technological Center Ltd
  * \author : Bardashevsky A.K.
  * \date : 13.09.2020
  * \time : 19:09
@@ -19,9 +18,9 @@ constexpr const float SPEED = 1.6f;
 }
 
 Asteroid::Asteroid( sf::Vector2f position )
-        : hp( 2 ),
-          hpMax( 2 ),
-          points( 5 )
+        : hpMax( 2 ),
+          points( 5 ),
+          hp( hpMax )
 {
     sprite.setTexture( AssetsStorage::instance().get< sf::Texture >( textures::ASTEROID ) );
     auto scale = utils::RandomGenerator::get( 0.2f, 0.45f );
@@ -29,7 +28,7 @@ Asteroid::Asteroid( sf::Vector2f position )
     sprite.setPosition( position );
 
     damage = scale > 0.4 ? 2 : 1;
-    //TODO make point dynamic
+    //TODO make points, hp dynamic. Based on scale
 }
 
 void Asteroid::update( float dt )
@@ -37,9 +36,9 @@ void Asteroid::update( float dt )
     sprite.move( 0.f, dt * SPEED );
 }
 
-void Asteroid::render( sf::RenderTarget & target )
+void Asteroid::render( sf::RenderTarget & window )
 {
-    target.draw( sprite );
+    window.draw( sprite );
 }
 
 sf::FloatRect Asteroid::getBounds() const
@@ -49,7 +48,10 @@ sf::FloatRect Asteroid::getBounds() const
 
 void Asteroid::takeDamage( int32_t damage )
 {
-    if( hp <= 0 ) { throw std::logic_error( "Asteroid already destroyed!" ); }
+    if( hp <= 0 )
+    {
+        return;
+    } //TODO log warning
 
     hp -= damage;
     sprite.setColor( sf::Color::Red );

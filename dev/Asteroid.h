@@ -1,6 +1,5 @@
 /*
  * \file Asteroid.h
- * \copyright (C) 2020 Special Technological Center Ltd
  * \author : Bardashevsky A.K.
  * \date : 13.09.2020
  * \time : 19:09
@@ -26,7 +25,7 @@ public:
     explicit Asteroid( sf::Vector2f position );
 
     void update( float dt );
-    void render( sf::RenderTarget & target );
+    void render( sf::RenderTarget & window );
 
     void takeDamage( int32_t damage );
 
@@ -38,10 +37,10 @@ public:
 private:
     sf::Sprite sprite;
 
+    const int32_t hpMax;
+    const int32_t points;
     int32_t hp;
-    int32_t hpMax;
     int32_t damage;
-    int32_t points;
 };
 
 }

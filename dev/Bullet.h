@@ -1,6 +1,5 @@
 /*
  * \file Bullet.h
- * \copyright (C) 2020 Special Technological Center Ltd
  * \author : Bardashevsky A.K.
  * \date : 13.09.2020
  * \time : 13:49
@@ -18,7 +17,7 @@ public:
     Bullet( const sf::Vector2f &position, sf::Vector2f direction, float ms);
 
     void update( float dt );
-    void render( sf::RenderTarget & target );
+    void render( sf::RenderTarget & window );
 
     constexpr static int32_t getDamage() noexcept { return damage; }
 
@@ -27,7 +26,7 @@ public:
 private:
     sf::Vector2f direction;
     float movementSpeed;
-    constexpr static int32_t damage = 1;
+    constexpr const static int32_t damage = 1;
 
     sf::Sprite sprite;
 };
